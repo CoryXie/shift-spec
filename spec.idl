@@ -72,7 +72,8 @@ interface Node {
 };
 
 interface Statement : Node { };
-interface IterationStatement : Node {
+
+interface IterationStatement : Statement {
   attribute Statement body;
 };
 
@@ -102,7 +103,10 @@ interface ExportDeclaration : Node { };
 
 // bindings
 
-typedef (ObjectBinding or ArrayBinding or BindingIdentifier) Binding;
+typedef (BindingPattern or BindingIdentifier) Binding;
+
+interface BindingPattern {
+};
 
 interface BindingWithDefault : Node {
   attribute Binding binding;
@@ -113,12 +117,12 @@ interface BindingIdentifier : Node {
   attribute Identifier name;
 };
 
-interface ArrayBinding : Node {
+interface ArrayBinding : BindingPattern {
   attribute (Binding or BindingWithDefault)?[] elements;
   attribute Binding? restElement;
 };
 
-interface ObjectBinding : Node {
+interface ObjectBinding : BindingPattern {
   attribute BindingProperty[] properties;
 };
 
@@ -138,7 +142,7 @@ interface BindingPropertyProperty : BindingProperty {
 // classes
 
 interface Class {
-  attribute Expression? super;
+  attribute Expression? inherit;
   attribute ClassElement[] elements;
 };
 
@@ -220,14 +224,18 @@ interface FunctionBody : Node {
 };
 
 interface FunctionDeclaration : Statement {
+  [Pre]
   attribute boolean isGenerator;
+  [Pre]
   attribute BindingIdentifier name;
   attribute FunctionBody body;
 };
 FunctionDeclaration implements Function;
 
 interface FunctionExpression : Expression {
+  [Pre]
   attribute boolean isGenerator;
+  [Pre]
   attribute BindingIdentifier? name;
   attribute FunctionBody body;
 };
@@ -299,14 +307,14 @@ interface ArrayExpression : Expression {
 };
 
 interface AssignmentExpression : Expression {
-  attribute AssignmentOperator operator;
   attribute (Binding or MemberExpression) binding;
+  attribute AssignmentOperator operator;
   attribute Expression expression;
 };
 
 interface BinaryExpression : Expression {
-  attribute BinaryOperator operator;
   attribute Expression left;
+  attribute BinaryOperator operator;
   attribute Expression right;
 };
 
@@ -315,7 +323,7 @@ interface CallExpression : Expression {
   attribute Arguments arguments;
 };
 
-interface ComputedMemberExpression : MemberExpression {
+interface ComputedMemberExpression : Expression {
   attribute Expression expression;
 };
 
